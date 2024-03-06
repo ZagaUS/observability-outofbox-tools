@@ -1,0 +1,28 @@
+apiVersion: tempo.grafana.com/v1alpha1
+kind: TempoStack
+metadata:
+  name: zaga-tempo
+  namespace: observability-redhat
+spec:
+  observability:
+    metrics:
+      createServiceMonitors: true
+      createPrometheusRules: true
+  resources:
+    total:
+      limits:
+        memory: 2Gi
+        cpu: 2000m
+  storageSize: 1Gi
+  storage:
+    secret:
+      name: zaga-tempo-secret
+      type: s3
+  template:
+    queryFrontend:
+      jaegerQuery:
+        enabled: true
+        ingress:
+          route:
+            termination: edge
+          type: route

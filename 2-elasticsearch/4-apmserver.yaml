@@ -1,0 +1,39 @@
+kind: ApmServer
+apiVersion: apm.k8s.elastic.co/v1
+metadata:
+  name: zaga-apmserver
+  namespace: observability-redhat
+spec:
+  version: 8.12.0
+  count: 1
+  elasticsearchRef:
+    name: zaga-elasticsearch
+  kibanaRef:
+    name: zaga-kibana
+  config: 
+    apm-server:
+      capture_personal_data: true
+    instrumentation: 
+      enabled: true
+    logging.level: info
+    logging.metrics.enabled: true
+    logging.to_stderr: true
+    output:
+      # Replace the hosts, username and password with the data created in {entsearch-name}-ent-user secret (created by the enterprise-search.yaml resource)
+      # where entsearch-name is the name of kind: EnterpriseSearch (enterprise-search.yaml)
+      elasticsearch: 
+        hosts: 
+          - 'zaga-es-entsearch-ent-http.observability-redhat.svc.cluster.local:3002'
+        password: TN21KE3nciB589HUeOc89W61
+        username: observability-redhat-zaga-es-entsearch-ent-user
+  http:
+    service:
+      metadata: {}
+      spec: {}
+    tls:
+      certificate: {}
+      selfSignedCertificate:
+      # For subjectAltnames.dns replace based on following naming convention: <metadata.name>-apm-http.<metadata.namespace>.svc.cluster.local
+        subjectAltNames:
+          - dns: >-
+              zaga-apmserver-apm-http.observability-redhat.svc.cluster.local

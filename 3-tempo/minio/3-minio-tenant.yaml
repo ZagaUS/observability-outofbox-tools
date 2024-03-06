@@ -1,0 +1,49 @@
+kind: Tenant
+apiVersion: minio.min.io/v2
+metadata:
+  annotations:
+    prometheus.io/path: /minio/v2/metrics/cluster
+    prometheus.io/port: '9000'
+    prometheus.io/scrape: 'true'
+  labels:
+    app: zaga-minio
+  name: zaga-minio
+  namespace: observability-redhat
+spec:
+  configuration:
+    name: minio-storage-configuration
+  env: []
+  features:
+    bucketDNS: false
+    domains: {}
+  image: >-
+    quay.io/minio/minio
+  imagePullSecret: {}
+  mountPath: /export
+  podManagementPolicy: Parallel
+  pools:
+    - containerSecurityContext: {}
+      name: pool-0
+      securityContext: {}
+      servers: 4
+      volumeClaimTemplate:
+        metadata:
+          name: data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+      volumesPerServer: 2
+  priorityClassName: ''
+  requestAutoCert: false
+  serviceAccountName: ''
+  serviceMetadata:
+    consoleServiceAnnotations: {}
+    consoleServiceLabels: {}
+    minioServiceAnnotations: {}
+    minioServiceLabels: {}
+  subPath: ''
+  users:
+    - name: minio-storage-user

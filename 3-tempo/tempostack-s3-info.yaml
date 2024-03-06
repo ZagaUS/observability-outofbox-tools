@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zaga-tempo-secret
+  namespace: observability-redhat
+stringData:
+  endpoint: http://minio.observability-redhat.svc.cluster.local:80
+  bucket: observ-redhat-demo
+  access_key_id: observ-redhat-access
+  access_key_secret: observ-redhat-secret
+type: Opaque

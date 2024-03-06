@@ -1,0 +1,52 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: rh-observ
+  namespace: observability-redhat
+spec:
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.95.0
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    processors:
+      batch:
+
+    exporters:
+      debug:
+        verbosity: detailed
+
+      otlp/elastic:
+        endpoint: zaga-apmserver-apm-http.observability-redhat.svc.cluster.local:8200
+        headers: 
+          Authorization: "Bearer B5V31711F57t9nN9FXyAkOZY"
+        tls: 
+          cert_file: /mnt/elastic-internal/http-certs/tls.crt
+          key_file: /mnt/elastic-internal/http-certs/tls.key
+          ca_file: /mnt/elastic-internal/http-certs/ca.crt
+
+      otlp/tempostack:
+         endpoint: tempo-zaga-tempo-distributor.observability-redhat.svc.cluster.local:4317
+         tls:
+           insecure: true
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [debug]
+          # otlp/elastic
+  mode: deployment
+  resources: {}
+  targetAllocator: {}
+  volumeMounts:
+  - name: elastic-internal-http-certificates
+    mountPath: /mnt/elastic-internal/http-certs
+  volumes:
+  - secret:
+      secretName: zaga-apmserver-apm-http-certs-internal
+    name: elastic-internal-http-certificates

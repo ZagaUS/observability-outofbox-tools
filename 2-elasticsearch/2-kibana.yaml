@@ -1,0 +1,47 @@
+kind: Kibana
+apiVersion: kibana.k8s.elastic.co/v1
+metadata:
+  name: zaga-kibana
+  namespace: observability-redhat
+spec:
+  version: 8.12.0
+  count: 1
+  elasticsearchRef:
+    name: zaga-elasticsearch
+  podTemplate:
+    metadata:
+      labels:
+        app: zaga-elasticsearch
+    spec:
+      containers:
+        - name: kibana
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 0.5
+            limits:
+              memory: 2Gi
+              cpu: 1.2
+
+--- 
+
+# After setting up the route, use the username and password generated in {elasticsearch-name}-es-elastic-user
+# where elasticsearch-name is the metadata.name of kind: Elasticsearch
+
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: zaga-kibana-es
+  namespace: observability-redhat
+spec:
+  # host: zaga-kibana-es-observability-redhat.apps.zagaobservability.zagaopensource.com
+  to:
+    kind: Service
+    name: zaga-kibana-kb-http
+    weight: 100
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: None
+  wildcardPolicy: None

@@ -1,0 +1,13 @@
+kind: EnterpriseSearch
+apiVersion: enterprisesearch.k8s.elastic.co/v1
+metadata:
+  name: zaga-es-entsearch
+  namespace: observability-redhat
+spec:
+  version: 8.12.0
+  config:
+    # Replace the below url with naming convention: https://<metadata.name>-ent-http.<metadata.namespace>.svc.cluster.local:3002
+    ent_search.external_url: 'https://zaga-es-entsearch-ent-http.observability-redhat.svc.cluster.local:3002' 
+  count: 1
+  elasticsearchRef:
+    name: zaga-elasticsearch
